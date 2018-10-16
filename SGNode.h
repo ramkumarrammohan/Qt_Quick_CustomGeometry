@@ -18,6 +18,11 @@ signals:
 private slots:
     void onButtonClicked();
 
+private:
+    void createMockData();
+
+    QList<int> m_mockData;
+
 };
 
 #endif // SGNODE_H

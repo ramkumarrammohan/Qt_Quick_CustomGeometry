@@ -19,7 +19,7 @@ Window {
 
         Button {
             id: buttonId
-            text: qsTr("Click me")
+            text: qsTr("!! Sketch wave !!")
             height: 50
             Layout.fillWidth: true
             anchors.leftMargin: 10
