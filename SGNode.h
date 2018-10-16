@@ -19,10 +19,8 @@ private slots:
     void onButtonClicked();
 
 private:
-    void createMockData();
-
-    QList<int> m_mockData;
-
+    QList<int> m_mockData{0, 5, 7, 2, 8, 4, 9, 6, 2, 3,
+                         8, 4, 1, 4, 8, 6, 4, 8, 9, 2, 6};
 };
 
 #endif // SGNODE_H
