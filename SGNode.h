@@ -2,7 +2,9 @@
 #define SGNODE_H
 
 #include <QQuickItem>
+#include <QTimer>
 
+class CSVReader;
 class SGNode : public QQuickItem
 {
     Q_OBJECT
@@ -17,10 +19,13 @@ signals:
 
 private slots:
     void onButtonClicked();
+    void onTimerTimeout();
 
 private:
-    QList<int> m_mockData{0, 5, 7, 2, 8, 4, 9, 6, 2, 3,
-                         8, 4, 1, 4, 8, 6, 4, 8, 9, 2, 6};
+    int m_readCursor;
+    int m_xLocation;
+    QTimer m_timer;
+    CSVReader *m_csvReader;
 };
 
 #endif // SGNODE_H
