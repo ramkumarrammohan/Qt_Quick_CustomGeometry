@@ -13,7 +13,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        main.cpp \
+    main.cpp \
     SGNode.cpp \
     CSVReader.cpp
 
@@ -36,3 +36,15 @@ HEADERS += \
 
 DISTFILES += \
     ecgsignals/*.csv
+
+MOC_DIR = $$OUT_PWD/moc/
+OBJECTS_DIR = $$OUT_PWD/obj/
+DESTDIR = $$OUT_PWD/bin/
+
+linux-g++ {
+    EXTRA_BINFILES += \
+        $$/ecgsignals/80_BPM_500HZ.csv
+    for(FILE, EXTRA_BINFILES){
+        QMAKE_POST_LINK += $$quote(cp $${FILE} $${DESTDIR})
+    }
+}

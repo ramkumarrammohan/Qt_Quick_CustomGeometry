@@ -7,6 +7,8 @@
 #include <QSGSimpleRectNode>
 
 static const int SegmentCount = 2;
+static const int HeadSize = 20;
+static const double GainFactor = 0.08;
 //static const int TotalSamples = 20;
 //static const int xPixelsScale = 15;
 //static const int yPixelsScale = 20;
@@ -45,8 +47,10 @@ void SGNode::onTimerTimeout()
 
 QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    QSGGeometryNode *node = nullptr;
+    QSGNode *parentNode = nullptr;
+    QSGGeometryNode *geometryNode = nullptr;
     QSGGeometry *geometry = nullptr;
+    QSGSimpleRectNode *rectNode = nullptr;
 
     int ht = int(height());
     int htRef = int(ht/2);
@@ -54,31 +58,44 @@ QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 
     if (!oldNode) {
         // Init all new
-        node = new QSGGeometryNode;
+        parentNode = new QSGNode;
+        geometryNode = new QSGGeometryNode;
+        rectNode = new QSGSimpleRectNode;
         geometry = new QSGGeometry(QSGGeometry::defaultAttributes_Point2D(), SegmentCount);
 
         // Geometry settings
         geometry->setLineWidth(2);
-        geometry->setDrawingMode(QSGGeometry::DrawLineStrip);
+        geometry->setDrawingMode(GL_LINE_STRIP);
         for (int i = 0; i < geometry->vertexCount(); ++i) {
-            geometry->vertexDataAsPoint2D()[i].set(i, m_csvReader->getData(m_readCursor)+htRef);
+            geometry->vertexDataAsPoint2D()[i].set(i, (m_csvReader->getData(m_readCursor)*GainFactor)+htRef);
             m_readCursor++;
+            m_xLocation++;
         }
 
         // Material design settings
         QSGFlatColorMaterial *material = new QSGFlatColorMaterial;
-        material->setColor(QColor(255, 0, 0));
+        material->setColor(Qt::red);
 
-        // node settings
-        node->setGeometry(geometry);
-        node->setFlag(QSGNode::OwnsGeometry);
-        node->setMaterial(material);
-        node->setFlag(QSGNode::OwnsMaterial);
+        // geometryNode settings
+        geometryNode->setGeometry(geometry);
+        geometryNode->setFlag(QSGGeometryNode::OwnsGeometry);
+        geometryNode->setMaterial(material);
+        geometryNode->setFlag(QSGNode::OwnsMaterial);
+
+        // Rectnode settings;
+        rectNode->setRect(m_xLocation, 0, HeadSize, ht);
+        rectNode->setColor(Qt::lightGray);
+
+        parentNode->appendChildNode(geometryNode);
+        parentNode->appendChildNode(rectNode);
 
     } else {
         // Change plots in oldNode
-        node = static_cast<QSGGeometryNode *>(oldNode);
-        geometry = node->geometry();
+        parentNode = static_cast<QSGNode *>(oldNode);
+        geometryNode = static_cast<QSGGeometryNode *>(parentNode->childAtIndex(0));
+        rectNode = static_cast<QSGSimpleRectNode *>(parentNode->childAtIndex(1));
+
+        geometry = geometryNode->geometry();
         int oldVertexCount = geometry->vertexCount();
         int maxdataAvail = m_csvReader->maxData();
 
@@ -91,7 +108,7 @@ QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
                     m_readCursor = 0;
                 }
 
-                int data = m_csvReader->getData(m_readCursor)+htRef;
+                int data = (m_csvReader->getData(m_readCursor)*GainFactor)+htRef;
                 m_readCursor++;
                 if (data > ht)
                     data = ht;
@@ -116,15 +133,17 @@ QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
                 m_readCursor = 0;
             }
 
-            int data = m_csvReader->getData(m_readCursor) + htRef;
+            int data = (m_csvReader->getData(m_readCursor)*GainFactor) + htRef;
             m_readCursor++;
             if (data > ht)
                 data = ht;
             geometry->vertexDataAsPoint2D()[m_xLocation].set(m_xLocation, data);
             m_xLocation++;
         }
-        node->markDirty(QSGNode::DirtyGeometry);
-    }
+        rectNode->setRect(m_xLocation, 0, HeadSize, ht);
 
-    return node;
+        rectNode->markDirty(QSGNode::DirtyGeometry);
+        geometryNode->markDirty(QSGNode::DirtyGeometry);
+    }
+    return parentNode;
 }

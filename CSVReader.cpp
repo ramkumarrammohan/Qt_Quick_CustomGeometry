@@ -33,8 +33,10 @@ int CSVReader::maxData()
 QString CSVReader::filePath()
 {
     QString csvResPath = getenv(SignalResPath);
-    if (csvResPath.isEmpty() || csvResPath.isNull())
+    if (csvResPath.isEmpty() || csvResPath.isNull()) {
+        qDebug() << "ecgsignals sample data not found";
         return QString();
+    }
 
     return QString("%1/%2").arg(csvResPath, MockFile);
 }
