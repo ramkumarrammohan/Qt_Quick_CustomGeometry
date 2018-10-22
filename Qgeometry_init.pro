@@ -41,7 +41,7 @@ MOC_DIR = $$OUT_PWD/moc/
 OBJECTS_DIR = $$OUT_PWD/obj/
 DESTDIR = $$OUT_PWD/bin/
 
-linux-g++ {
+linux-g++ || unix {
     EXTRA_BINFILES += \
         $$/ecgsignals/80_BPM_500HZ.csv
     for(FILE, EXTRA_BINFILES){

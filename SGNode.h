@@ -22,6 +22,8 @@ private slots:
     void onTimerTimeout();
 
 private:
+    void createChildNodes(QSGNode *parent);
+
     int m_readCursor;
     int m_xLocation;
     QTimer m_timer;
