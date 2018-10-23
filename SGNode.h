@@ -23,11 +23,14 @@ private slots:
 
 private:
     void createChildNodes(QSGNode *parent);
+    void drawGridLines();
 
     int m_readCursor;
     int m_xLocation;
     QTimer m_timer;
     CSVReader *m_csvReader;
+
+    QPainter *m_painter;
 };
 
 #endif // SGNODE_H

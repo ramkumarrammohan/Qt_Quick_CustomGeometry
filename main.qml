@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.3
 
 // custom qml import
 import SGNode 1.0
+import GridBG 1.0
 
 Window {
     visible: true
@@ -28,9 +29,14 @@ Window {
         }
 
         Rectangle {
-            color: "light grey"
+            color: "white"
             Layout.fillWidth: true
             Layout.fillHeight: true
+
+            GridBG {
+                id: gridBGId
+                anchors.fill: parent
+            }
 
             SGNode {
                 id: sgnodeId

@@ -15,7 +15,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     main.cpp \
     SGNode.cpp \
-    CSVReader.cpp
+    CSVReader.cpp \
+    GridBG.cpp
 
 RESOURCES += qml.qrc
 
@@ -32,7 +33,8 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 
 HEADERS += \
     SGNode.h \
-    CSVReader.h
+    CSVReader.h \
+    GridBG.h
 
 DISTFILES += \
     ecgsignals/*.csv

@@ -5,6 +5,7 @@
 #include <QSGNode>
 #include <QSGFlatColorMaterial>
 #include <QSGSimpleRectNode>
+#include <QPainter>
 
 static const int SegmentCount = 2;
 static const int HeadSize = 20;
@@ -16,7 +17,8 @@ static const double GainFactor = 0.08;
 
 SGNode::SGNode(QQuickItem *parent) :
     QQuickItem(parent),
-    m_csvReader(nullptr)
+    m_csvReader(nullptr),
+    m_painter(nullptr)
 {
     qDebug() << "SGNode init";
     m_readCursor = 0;
@@ -28,7 +30,7 @@ SGNode::SGNode(QQuickItem *parent) :
     connect(&m_timer, &QTimer::timeout, this, &SGNode::onTimerTimeout);
 
     setFlag(ItemHasContents, true);
-    m_timer.start(40);
+    drawGridLines();
 }
 
 SGNode::~SGNode()
@@ -92,6 +94,21 @@ void SGNode::createChildNodes(QSGNode *parent)
     m_xLocation++;
 }
 
+void SGNode::drawGridLines()
+{
+    if (!m_painter)
+        m_painter = new QPainter;
+
+    QVector<QLineF> normalLines;
+    QVector<QLineF> boldLines;
+
+    normalLines.append(QLineF(0, 10, width(), height()));
+
+    m_painter->setRenderHint(QPainter::Antialiasing);
+    m_painter->setPen(QPen(QColor("black"), 1, Qt::SolidLine));
+    m_painter->drawLines(normalLines);
+}
+
 QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     QSGNode *parentNode = nullptr;
@@ -112,6 +129,9 @@ QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         // Change plots in oldNode
         parentNode = static_cast<QSGNode *>(oldNode);
         rectNode = static_cast<QSGSimpleRectNode *>(parentNode->childAtIndex(0));
+
+        rectNode->setRect(m_xLocation, 0, HeadSize, ht);
+        rectNode->markDirty(QSGNode::DirtyGeometry);
 
         for (int childNodeIndex = 1; childNodeIndex < parentNode->childCount(); childNodeIndex++) {
             int childHtRef = (htRef * childNodeIndex) - htRefHalf;
@@ -157,9 +177,6 @@ QSGNode *SGNode::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
         }
         m_readCursor++;
         m_xLocation++;
-
-        rectNode->setRect(m_xLocation, 0, HeadSize, ht);
-        rectNode->markDirty(QSGNode::DirtyGeometry);
     }
     return parentNode;
 }
